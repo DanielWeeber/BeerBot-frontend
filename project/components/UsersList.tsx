@@ -1,12 +1,20 @@
 "use client"
 import React, { useEffect, useState, useRef } from 'react'
+import Image from 'next/image'
 
-export default function UsersList({ title, users, range }) {
-  const [stats, setStats] = useState({})
-  const [names, setNames] = useState({})
-  const [avatars, setAvatars] = useState({})
-  const lastArgsRef = useRef(null)
-  const mounted = useRef(true)
+type DateRange = { start?: string; end?: string }
+type UsersListProps = {
+  title: 'Givers' | 'Recipients' | string
+  users: string[]
+  range: DateRange
+}
+
+export default function UsersList({ title, users, range }: UsersListProps) {
+  const [stats, setStats] = useState<Record<string, number>>({})
+  const [names, setNames] = useState<Record<string, string>>({})
+  const [avatars, setAvatars] = useState<Record<string, string | null>>({})
+  const lastArgsRef = useRef<string | null>(null)
+  const mounted = useRef<boolean>(true)
 
   useEffect(() => {
     mounted.current = true
@@ -24,9 +32,9 @@ export default function UsersList({ title, users, range }) {
     let cancelled = false
     const timer = setTimeout(() => {
       async function loadStats() {
-        const out = {}
+        const out: Record<string, number> = {}
         const path = title === 'Givers' ? '/api/proxy/given' : '/api/proxy/received'
-        let params = new URLSearchParams()
+        const params = new URLSearchParams()
         if (range?.start && range?.end) {
           if (range.start === range.end) {
             params.set('day', range.start)
@@ -37,15 +45,18 @@ export default function UsersList({ title, users, range }) {
         }
         const concurrency = 5
         let idx = 0
-        async function worker() {
+        async function worker(): Promise<void> {
           while (idx < users.length && !cancelled) {
             const i = idx++
             const u = users[i]
             const q = new URLSearchParams()
             q.set('user', u)
-            if (params.has('day')) q.set('day', params.get('day'))
-            if (params.has('start')) q.set('start', params.get('start'))
-            if (params.has('end')) q.set('end', params.get('end'))
+            const day = params.get('day')
+            if (day) q.set('day', day)
+            const startV = params.get('start')
+            if (startV) q.set('start', startV)
+            const endV = params.get('end')
+            if (endV) q.set('end', endV)
             try {
               const resp = await fetch(`${path}?${q.toString()}`)
               if (!resp.ok) {
@@ -55,11 +66,12 @@ export default function UsersList({ title, users, range }) {
               const j = await resp.json()
               out[u] = title === 'Givers' ? j.given : j.received
             } catch (err) {
+              console.error(err);
               out[u] = 0
             }
           }
         }
-        const workers = []
+        const workers: Promise<void>[] = []
         for (let i = 0; i < concurrency; i++) workers.push(worker())
         await Promise.all(workers)
         if (cancelled || !mounted.current) return
@@ -97,12 +109,13 @@ export default function UsersList({ title, users, range }) {
             namesOut[u] = j.real_name || u
             avatarsOut[u] = j.profile_image || null
           } catch (err) {
+            console.error(err);
             namesOut[u] = u
             avatarsOut[u] = null
           }
         }
       }
-      const workers = []
+      const workers: Promise<void>[] = []
       for (let i = 0; i < concurrency; i++) workers.push(worker())
       await Promise.all(workers)
       if (!cancelled && mounted.current) {
@@ -143,9 +156,12 @@ export default function UsersList({ title, users, range }) {
             >
               <div className="flex items-center gap-3">
                 {avatars[user] ? (
-                  <img
-                    src={avatars[user]}
+                  <Image
+                    src={avatars[user] as string}
                     alt={names[user] || user}
+                    width={32}
+                    height={32}
+                    unoptimized
                     className="w-8 h-8 rounded-full object-cover shadow-sm border border-indigo-200"
                   />
                 ) : (

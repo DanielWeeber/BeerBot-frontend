@@ -10,32 +10,30 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: project
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: '18'
-          cache: 'npm'
+          bun-version: '1.3.0'
 
       - name: Install dependencies
-        run: |
-          # Try npm ci first, fallback to npm install if lock file is out of sync
-          npm ci || (echo "Lock file out of sync, running npm install..." && npm install)
+        run: bun install --frozen-lockfile
 
       - name: Run type check
-        run: npm run type-check || npx tsc --noEmit
+        run: bunx tsc --noEmit
 
       - name: Run lint
-        run: npm run lint
+        run: bun run lint
 
       - name: Build application
-        run: npm run build
+        run: bun run build
 
       - name: Check for security vulnerabilities
-        run: |
-          npm audit --audit-level high
-          echo "Note: Some vulnerabilities may require major version upgrades"
+        run: bun audit --audit-level high

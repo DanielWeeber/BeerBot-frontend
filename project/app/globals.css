@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "react-datepicker/dist/react-datepicker.css";
 
 html, body, #__next {
   height: 100%;
@@ -119,4 +120,66 @@ button:hover, .btn:hover {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
   }
+}
+
+/* Token-backed utility helpers for surfaces, borders, and cards */
+.surface {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.surface-inverse {
+  background-color: hsl(var(--popover));
+  color: hsl(var(--popover-foreground));
+}
+
+.bordered {
+  border-color: hsl(var(--border));
+}
+
+.card {
+  background-color: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+}
+
+/* React DatePicker token-based theming */
+/* Strengthened overrides so they beat package defaults */
+:root .react-datepicker,
+:root .react-datepicker__month-container,
+:root .react-datepicker__header,
+:root .react-datepicker__month,
+:root .react-datepicker__week,
+:root .react-datepicker__day,
+:root .react-datepicker__day-name,
+:root .react-datepicker__current-month {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--card-foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+:root .react-datepicker {
+  border: 1px solid hsl(var(--border)) !important;
+}
+
+:root .react-datepicker__header {
+  border-bottom: 1px solid hsl(var(--border)) !important;
+}
+
+:root .react-datepicker__day--outside-month {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+:root .react-datepicker__day--selected,
+:root .react-datepicker__day--keyboard-selected {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+:root .react-datepicker__day:hover {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+:root .react-datepicker__navigation-icon::before {
+  border-color: hsl(var(--card-foreground)) !important;
 }

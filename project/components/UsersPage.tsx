@@ -1,10 +1,13 @@
 "use client"
 
 import { useEffect, useState } from 'react'
+import type { ReactElement } from 'react'
 import UsersList from './UsersList'
 import DateRangePicker from './DateRangePicker'
 
-const quickRanges = [
+type DateRange = { start: string; end: string }
+
+const quickRanges: Array<{ label: string; get: () => DateRange }> = [
   {
     label: 'Today',
     get: () => {
@@ -72,16 +75,16 @@ const quickRanges = [
   }
 ];
 
-export default function UsersPage() {
+export default function UsersPage(): ReactElement {
   // Default to current year
   const now = new Date()
   const yearStart = new Date(now.getFullYear(), 0, 1)
-  const [range, setRange] = useState({
+  const [range, setRange] = useState<DateRange>({
     start: yearStart.toISOString().slice(0, 10),
     end: now.toISOString().slice(0, 10)
   })
-  const [givers, setGivers] = useState([])
-  const [recipients, setRecipients] = useState([])
+  const [givers, setGivers] = useState<string[]>([])
+  const [recipients, setRecipients] = useState<string[]>([])
   // The proxy will inject an API token from server-side environment variables.
   useEffect(() => {
     async function load() {
