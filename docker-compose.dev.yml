@@ -1,0 +1,26 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    environment:
+      NEXT_PUBLIC_BACKEND_BASE: "http://host.docker.internal:8080"
+      API_TOKEN: "my-secret-token"
+      OIDC_ENABLED: "true"
+      #NEXT_PUBLIC_OIDC_ENABLED: "true"
+      OIDC_CLIENT_ID: "9hwaV8QKZbuTAXGE9oBzAtcUQ4PAgtXFw4Xru1gV"
+      OIDC_CLIENT_SECRET: "X78iXIdqTQYXJeAtXnOg5RbneEU729fpgfEhLgFGgvWSQjxdxALcGoHM4ko2rZz5P7sd5GzJGKVXX4iHzuaFtl4BddykrVrYV43tMLAlAUtpZyJeUIy8gy86qZablMNL"
+      OIDC_ISSUER: "https://auth.twt.de/application/o/twt-beer-bot/"
+      OIDC_WELL_KNOWN: "https://auth.twt.de/application/o/twt-beer-bot/.well-known/openid-configuration"
+      #OIDC_AUTHORIZATION_URL: "https://your-issuer-url/oauth2/v1/authorize"
+      #OIDC_TOKEN_URL: "https://your-issuer-url/oauth2/v1/token"
+      #OIDC_USERINFO_URL: "https://your-issuer-url/oauth2/v1/userinfo"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/app
+      - node_modules:/app/node_modules
+    command: npm run dev
+
+volumes:
+  node_modules:

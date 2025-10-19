@@ -1,0 +1,17 @@
+# Development Dockerfile for Next.js
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package.json ./
+# If package-lock.json exists in context, copy it; otherwise, generate it in the container
+RUN if [ -f package-lock.json ]; then cp package-lock.json ./; else npm install --package-lock-only; fi
+RUN npm ci --include=dev
+
+FROM node:20-alpine AS dev
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/package.json ./package.json
+COPY --from=deps /app/package-lock.json ./package-lock.json
+COPY . .
+ENV NODE_ENV=development
+EXPOSE 3000
+CMD ["npm", "run", "dev"]
