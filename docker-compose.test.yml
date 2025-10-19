@@ -5,4 +5,4 @@ services:
       dockerfile: docker/Dockerfile
     environment:
       NEXT_PUBLIC_BACKEND_BASE: "http://localhost:8080"
-    command: npm run build
+    command: bun run build

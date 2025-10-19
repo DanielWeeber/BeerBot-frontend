@@ -2,11 +2,11 @@
 
 # 🍺 BeerBot Frontend
 
-[![Next.js](https://img.shields.io/badge/Next.js-13.4+-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15+-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![Docker Hub](https://img.shields.io/badge/Docker%20Hub-danielweeber%2Fbeerbot--frontend-2496ED?style=flat-square&logo=docker)](https://hub.docker.com/r/danielweeber/beerbot-frontend)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4+-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
-[![React](https://img.shields.io/badge/React-18.3+-61DAFB?style=flat-square&logo=react)](https://reactjs.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.x-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
+[![React](https://img.shields.io/badge/React-19+-61DAFB?style=flat-square&logo=react)](https://reactjs.org/)
 
 **Modern React dashboard for BeerBot analytics and team appreciation insights! 📊**
 
@@ -21,23 +21,27 @@ The BeerBot Frontend is a modern web application that visualizes beer giving pat
 ## ✨ Features
 
 ### 📊 Analytics Dashboard
+
 - **Real-time Statistics**: Live beer giving/receiving counts
 - **Interactive Charts**: Visual representation of appreciation trends
 - **Date Range Filtering**: Flexible time period analysis
 - **User Leaderboards**: Top givers and receivers
 
 ### 👥 User Management
+
 - **Profile Integration**: Slack profile photos and names
 - **Individual Stats**: Personal giving/receiving history  
 - **Team Overview**: Complete user directory with statistics
 
 ### 🎨 Modern UI/UX
+
 - **Responsive Design**: Works perfectly on desktop, tablet, and mobile
 - **Dark/Light Mode**: System preference detection and manual toggle
 - **Smooth Animations**: Polished micro-interactions
 - **Accessible**: WCAG 2.1 compliant interface
 
 ### 🔧 Technical Features
+
 - **Server-Side Rendering**: Fast initial page loads with Next.js
 - **API Integration**: Seamless communication with BeerBot backend
 - **Optimized Performance**: Lazy loading and code splitting
@@ -46,6 +50,7 @@ The BeerBot Frontend is a modern web application that visualizes beer giving pat
 ## 🏗️ Architecture
 
 ### Tech Stack
+
 - **Framework**: Next.js 13.4+ with App Router
 - **Language**: TypeScript 5.9+
 - **Styling**: Tailwind CSS 3.4+
@@ -55,31 +60,40 @@ The BeerBot Frontend is a modern web application that visualizes beer giving pat
 - **State Management**: React hooks and context
 
 ### Project Structure
+
 ```
 BeerBot-frontend/
-├── app/                    # Next.js App Router pages
-│   ├── globals.css        # Global styles and Tailwind imports
-│   ├── layout.jsx         # Root layout component
-│   └── page.jsx          # Home page component
-├── components/           # Reusable UI components
-│   ├── DateRangePicker.jsx  # Date selection component
-│   ├── UsersList.jsx       # User directory component
-│   └── UsersPage.jsx       # Main users page layout
-├── lib/                  # Utility functions and configurations
-│   └── authOptions.js    # Authentication configuration
-├── pages/api/           # API routes and proxies
-│   ├── health.js        # Health check endpoint
-│   ├── auth/           # Authentication handlers
-│   └── proxy/          # Backend API proxy
-├── public/             # Static assets
-├── scripts/           # Build and deployment scripts
-└── docker/           # Docker configurations
+├── project/                        # Next.js app (App Router)
+│   ├── app/                        # Routes and APIs
+│   │   ├── api/
+│   │   │   ├── health/route.ts     # Health endpoint
+│   │   │   └── proxy/[...path]/route.ts  # Backend proxy
+│   │   ├── layout.tsx              # Root layout
+│   │   ├── not-found.tsx           # 404 page
+│   │   └── page.tsx                # Home page
+│   ├── components/                 # UI components
+│   ├── public/                     # Static assets
+│   ├── globals.css                 # Global styles
+│   ├── package.json                # App package (type: module)
+│   ├── bun.lock                    # Bun lockfile
+│   ├── eslint.config.mjs           # ESLint flat config
+│   ├── tailwind.config.js          # Tailwind config (ESM export)
+│   └── next.config.js              # Next.js config (ESM)
+├── docker/
+│   └── Dockerfile                  # Multi-stage Bun-based image
+├── docker-compose.yml              # Example production compose
+├── docker-compose.dev.yml          # Dev compose (hot reload)
+├── docker-compose.test.yml         # CI/test compose
+├── .github/workflows/              # CI and Docker build workflows
+├── DOCKER.md                       # Detailed Docker docs
+└── README.md
 ```
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- [Node.js 18+](https://nodejs.org/) or [Bun](https://bun.sh/) runtime
+
+- [Bun](https://bun.sh/) 1.3+ (recommended) or Node.js 18+
 - [Docker](https://www.docker.com/) (optional, for containerized development)
 - Running BeerBot Backend instance
 
@@ -100,7 +114,6 @@ docker run -d \
 **Complete Docker Compose Example:**
 
 ```yaml
-version: '3.8'
 services:
   beerbot-frontend:
     image: danielweeber/beerbot-frontend:latest
@@ -148,34 +161,39 @@ volumes:
 ### Local Development from Source
 
 1. **Clone and navigate:**
+
    ```bash
    git clone https://github.com/DanielWeeber/BeerBot-frontend.git
    cd BeerBot-frontend
    ```
 
 2. **Install dependencies:**
+
    ```bash
-   # Using npm
-   npm install
-   
    # Using bun (recommended)
    bun install
+
+   # Using npm
+   npm install
    ```
 
 3. **Configure environment:**
-   Create `.env.local` file:
+
+   Create `project/.env.local` (or `.env.local` when inside `project/`):
+
    ```env
    NEXT_PUBLIC_BACKEND_BASE=http://localhost:8080
    NEXT_PUBLIC_API_TOKEN=your-api-token-here
    ```
 
 4. **Start development server:**
+
    ```bash
-   # Using npm
-   npm run dev
-   
    # Using bun
    bun run dev
+
+   # Using npm
+   npm run dev
    ```
 
 5. **Open in browser:**
@@ -185,13 +203,13 @@ volumes:
 
 ```bash
 # Development with hot reload
-docker-compose -f docker-compose.dev.yml up
+docker compose -f docker-compose.dev.yml up
 
 # Production build
-docker-compose up -d
+docker compose up -d
 
 # Testing
-docker-compose -f docker-compose.test.yml up
+docker compose -f docker-compose.test.yml up
 ```
 
 ## 🛠️ Usage
@@ -199,11 +217,13 @@ docker-compose -f docker-compose.test.yml up
 ### Dashboard Navigation
 
 **Home Page (`/`)**
+
 - Overview statistics and charts
 - Recent activity feed
 - Quick user search
 
 **Users Page (`/users`)**
+
 - Complete user directory
 - Individual user statistics
 - Filter and sort capabilities
@@ -213,11 +233,13 @@ docker-compose -f docker-compose.test.yml up
 The frontend communicates with the BeerBot backend through:
 
 **Proxy Endpoints** (`/api/proxy/[...path]`)
+
 - Automatic authentication header injection
 - Request/response logging
 - Error handling and retry logic
 
 **Direct Integration**
+
 ```javascript
 // Example: Fetch user statistics
 const response = await fetch('/api/proxy/given?user=U1234567890&start=-7d');
@@ -227,6 +249,7 @@ const data = await response.json();
 ### Date Range Selection
 
 Flexible date queries supported:
+
 - **Specific dates**: `2024-10-19`
 - **Relative ranges**: `-7d`, `-1m`, `-1y`
 - **Custom ranges**: Interactive date picker
@@ -235,7 +258,8 @@ Flexible date queries supported:
 
 ### Theme Configuration
 
-Tailwind CSS configuration in `tailwind.config.js`:
+Tailwind CSS configuration in `project/tailwind.config.js`:
+
 ```javascript
 module.exports = {
   theme: {
@@ -253,6 +277,7 @@ module.exports = {
 ### Component Styling
 
 Components use Tailwind utility classes:
+
 ```jsx
 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
   <h2 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -290,8 +315,8 @@ docker run -d \
 **Building from Source:**
 
 ```bash
-# Build production image
-docker build -t beerbot-frontend .
+# Build production image (Dockerfile expects context at ./project)
+docker build -f docker/Dockerfile -t beerbot-frontend ./project
 
 # Run container
 docker run -p 3000:3000 \
@@ -324,22 +349,26 @@ npx serve out/
 
 ### Build Configuration
 
-**Next.js Config** (`next.config.js`):
-```javascript
-module.exports = {
+**Next.js Config** (`project/next.config.js`, ESM):
+
+```js
+export default {
   output: 'standalone', // For Docker deployments
   images: {
-    domains: ['avatars.slack-edge.com'], // Slack avatars
+    // If you enable optimization for remote avatars, configure hosts here
+    remotePatterns: [
+      // { protocol: 'https', hostname: 'avatars.slack-edge.com' }
+    ],
   },
   async rewrites() {
     return [
       {
         source: '/api/proxy/:path*',
-        destination: `${process.env.NEXT_PUBLIC_BACKEND_BASE}/api/:path*`
-      }
-    ];
-  }
-};
+        destination: `${process.env.NEXT_PUBLIC_BACKEND_BASE}/api/:path*`,
+      },
+    ]
+  },
+}
 ```
 
 ## 🧪 Testing
@@ -348,13 +377,13 @@ module.exports = {
 
 ```bash
 # Lint code
-npm run lint
+bun run lint
 
 # Type check
-npm run type-check
+bunx tsc --noEmit
 
 # Build test
-npm run build
+bun run build
 ```
 
 ### Component Testing
@@ -372,6 +401,7 @@ npm run test:visual
 ### Common Issues
 
 **API Connection Errors:**
+
 ```bash
 # Check backend connectivity
 curl http://localhost:8080/api/health
@@ -381,6 +411,7 @@ echo $NEXT_PUBLIC_BACKEND_BASE
 ```
 
 **Build Failures:**
+
 ```bash
 # Clear cache
 rm -rf .next
@@ -391,6 +422,7 @@ npm audit
 ```
 
 **Styling Issues:**
+
 ```bash
 # Rebuild Tailwind
 npx tailwindcss -i ./app/globals.css -o ./dist/output.css --watch
@@ -401,6 +433,7 @@ npx tailwindcss -i ./app/globals.css -o ./dist/output.css --watch
 We welcome contributions to improve the frontend experience!
 
 ### Development Workflow
+
 1. Fork the repository
 2. Create feature branch: `git checkout -b feature/amazing-ui`
 3. Make changes and test locally
@@ -408,6 +441,7 @@ We welcome contributions to improve the frontend experience!
 5. Push and create Pull Request
 
 ### Code Standards
+
 - Use TypeScript for type safety
 - Follow React best practices and hooks patterns
 - Implement responsive design (mobile-first)
@@ -415,6 +449,7 @@ We welcome contributions to improve the frontend experience!
 - Test components before submitting
 
 ### UI/UX Guidelines
+
 - Maintain consistent spacing using Tailwind scale
 - Use semantic HTML elements
 - Ensure keyboard navigation support

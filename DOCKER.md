@@ -95,7 +95,6 @@ docker run -d \
 ### With Docker Compose
 
 ```yaml
-version: '3.8'
 services:
   frontend:
     image: danielweeber/beerbot-frontend:latest

@@ -40,7 +40,7 @@ RUN chown bun:bun /usr/src/app
 
 # Install wget for healthcheck (Debian-based bun image)
 USER root
-RUN apt-get update && apt-get install -y --no-install-recommends wget ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends wget curl ca-certificates && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables from build arguments
 ENV NEXT_TELEMETRY_DISABLED=1

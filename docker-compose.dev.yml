@@ -10,4 +10,3 @@ services:
       - "3000:3000"
     volumes:
       - ./project:/app/beerbot
-    command: sh -c "bun install && bun run dev"
