@@ -3,6 +3,7 @@
 # 🍺 BeerBot Frontend
 
 [![Next.js](https://img.shields.io/badge/Next.js-13.4+-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Docker Hub](https://img.shields.io/badge/Docker%20Hub-danielweeber%2Fbeerbot--frontend-2496ED?style=flat-square&logo=docker)](https://hub.docker.com/r/danielweeber/beerbot-frontend)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4+-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
 [![React](https://img.shields.io/badge/React-18.3+-61DAFB?style=flat-square&logo=react)](https://reactjs.org/)
@@ -82,12 +83,74 @@ BeerBot-frontend/
 - [Docker](https://www.docker.com/) (optional, for containerized development)
 - Running BeerBot Backend instance
 
-### Local Development
+### 🐳 Using Docker Images
+
+**Quick Start with Docker Hub:**
+
+```bash
+# Pull and run the latest image
+docker run -d \
+  --name beerbot-frontend \
+  -p 3000:3000 \
+  -e NEXT_PUBLIC_BACKEND_BASE="http://localhost:8080" \
+  -e NEXT_PUBLIC_API_TOKEN="your-api-token" \
+  danielweeber/beerbot-frontend:latest
+```
+
+**Complete Docker Compose Example:**
+
+```yaml
+version: '3.8'
+services:
+  beerbot-frontend:
+    image: danielweeber/beerbot-frontend:latest
+    container_name: beerbot-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_BACKEND_BASE: "http://beerbot-backend:8080"
+      NEXT_PUBLIC_API_TOKEN: "your-api-token"
+      NODE_ENV: "production"
+    depends_on:
+      - beerbot-backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  beerbot-backend:
+    image: danielweeber/beerbot-backend:latest
+    container_name: beerbot-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      BOT_TOKEN: "xoxb-your-bot-token"
+      APP_TOKEN: "xapp-your-app-token"
+      API_TOKEN: "your-api-token"
+      CHANNEL: "C1234567890"
+      EMOJI: ":beer:"
+      MAX_PER_DAY: "10"
+    volumes:
+      - beerbot-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  beerbot-data:
+```
+
+### Local Development from Source
 
 1. **Clone and navigate:**
    ```bash
-   git clone https://github.com/DanielWeeber/BeerBot.git
-   cd BeerBot/BeerBot-frontend
+   git clone https://github.com/DanielWeeber/BeerBot-frontend.git
+   cd BeerBot-frontend
    ```
 
 2. **Install dependencies:**
@@ -211,6 +274,20 @@ vercel --prod
 ```
 
 ### Docker Production
+
+**Using Docker Hub Image:**
+
+```bash
+# Pull and run production image
+docker run -d \
+  --name beerbot-frontend \
+  -p 3000:3000 \
+  -e NEXT_PUBLIC_BACKEND_BASE=https://your-backend.com \
+  -e NEXT_PUBLIC_API_TOKEN=your-token \
+  danielweeber/beerbot-frontend:latest
+```
+
+**Building from Source:**
 
 ```bash
 # Build production image
