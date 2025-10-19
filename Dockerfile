@@ -13,7 +13,6 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/package.json ./package.json
 COPY . .
 COPY components ./components
-COPY lib ./lib
 RUN ls -l /app && ls -l /app/app && ls -l /app/pages
 RUN mkdir -p public
 RUN npm run build
@@ -28,7 +27,6 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/app ./app
 COPY --from=builder /app/pages ./pages
-COPY --from=builder /app/lib ./lib
 COPY --from=builder /app/components ./components
 EXPOSE 3000
 RUN chmod +x ./scripts/wait-for-backend.sh || true
