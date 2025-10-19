@@ -22,10 +22,6 @@
 .env
 .env.local
 
-# Docker
-docker-compose.override.yml
-docker-compose.*.local.yml
-
 # Logs
 *.log
 logs/
@@ -34,6 +30,8 @@ logs/
 **/node_modules/
 **/dist/
 **/build/
+**/.next/
+**/.next/*
 
 # Misc
 coverage.out
