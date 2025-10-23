@@ -5,18 +5,14 @@ import { Sun, Moon } from 'lucide-react'
 import { useTheme } from './ThemeProvider'
 
 export default function ThemeToggle() {
-  const { toggleTheme } = useTheme()
-  const [isDark, setIsDark] = useState(false)
-
-  useEffect(() => {
-    if (typeof document !== 'undefined') {
-      setIsDark(document.documentElement.classList.contains('dark'))
-    }
-  }, [])
+  const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  const isDark = mounted ? resolvedTheme === 'dark' : false
 
   function onClick() {
-    toggleTheme()
-    setIsDark((v) => !v)
+    const next = isDark ? 'light' : 'dark'
+    setTheme(next)
   }
 
   return (

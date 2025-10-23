@@ -2,7 +2,7 @@
 
 # 🍺 BeerBot Frontend
 
-[![Next.js](https://img.shields.io/badge/Next.js-15+-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16+-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![Docker Hub](https://img.shields.io/badge/Docker%20Hub-danielweeber%2Fbeerbot--frontend-2496ED?style=flat-square&logo=docker)](https://hub.docker.com/r/danielweeber/beerbot-frontend)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.x-06B6D4?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import type { ReactElement } from 'react'
 import UsersList from './UsersList'
 import DateRangePicker from './DateRangePicker'
+import { logger, withTiming } from '../lib/logger'
 
 type DateRange = { start: string; end: string }
 
@@ -76,25 +77,36 @@ const quickRanges: Array<{ label: string; get: () => DateRange }> = [
 ];
 
 export default function UsersPage(): ReactElement {
-  // Default to current year
-  const now = new Date()
-  const yearStart = new Date(now.getFullYear(), 0, 1)
-  const [range, setRange] = useState<DateRange>({
-    start: yearStart.toISOString().slice(0, 10),
-    end: now.toISOString().slice(0, 10)
-  })
+  // Initialize empty, then set on mount to avoid SSR/CSR time drift
+  const [range, setRange] = useState<DateRange>({ start: '', end: '' })
   const [givers, setGivers] = useState<string[]>([])
   const [recipients, setRecipients] = useState<string[]>([])
   // The proxy will inject an API token from server-side environment variables.
   useEffect(() => {
+    // Set default range based on client clock to avoid hydration mismatch
+    const now = new Date()
+    const yearStart = new Date(now.getFullYear(), 0, 1)
+    setRange({ start: yearStart.toISOString().slice(0, 10), end: now.toISOString().slice(0, 10) })
+  }, [])
+
+  useEffect(() => {
+    if (!range.start || !range.end) return
     async function load() {
-      const gResp = await fetch('/api/proxy/givers')
-      const rResp = await fetch('/api/proxy/recipients')
-      if (gResp.ok) setGivers(await gResp.json())
-      if (rResp.ok) setRecipients(await rResp.json())
+      const gResp = await withTiming('fetch_givers', () => fetch('/api/proxy/givers'))
+      const rResp = await withTiming('fetch_recipients', () => fetch('/api/proxy/recipients'))
+      if (gResp.ok) {
+        setGivers(await gResp.json())
+      } else {
+        logger.warn('fetch_givers: non_ok', { status: gResp.status })
+      }
+      if (rResp.ok) {
+        setRecipients(await rResp.json())
+      } else {
+        logger.warn('fetch_recipients: non_ok', { status: rResp.status })
+      }
     }
     load()
-  }, [])
+  }, [range.start, range.end])
 
   return (
     <section>
@@ -109,7 +121,11 @@ export default function UsersPage(): ReactElement {
             <button
               key={q.label}
               className="px-3 py-1 rounded bg-indigo-100 hover:bg-indigo-300 text-indigo-900 text-sm font-medium border border-indigo-200 transition-colors duration-150 shadow-sm"
-              onClick={() => setRange(q.get())}
+              onClick={() => {
+                const next = q.get()
+                logger.info('range_quick', { label: q.label, start: next.start, end: next.end })
+                setRange(next)
+              }}
               type="button"
             >
               {q.label}
@@ -120,7 +136,10 @@ export default function UsersPage(): ReactElement {
           <DateRangePicker
             start={range.start}
             end={range.end}
-            onChange={(s, e) => setRange({ start: s, end: e })}
+            onChange={(s, e) => {
+              logger.info('range_change', { start: s, end: e })
+              setRange({ start: s, end: e })
+            }}
           />
         </div>
       </div>

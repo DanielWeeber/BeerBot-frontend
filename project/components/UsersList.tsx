@@ -147,11 +147,11 @@ export default function UsersList({ title, users, range }: UsersListProps) {
       {sorted.length === 0 ? (
         <div className="text-gray-400 text-sm">No data</div>
       ) : (
-        <ul className="divide-y divide-indigo-100">
+        <ul className="divide-y divide-indigo-100 dark:divide-indigo-800/50">
           {sorted.map(({ user, count }, i) => (
             <li
               key={user}
-              className="flex items-center justify-between py-2 group hover:bg-indigo-50 transition rounded-lg px-2"
+              className="flex items-center justify-between py-2 group hover:bg-indigo-50 dark:hover:bg-indigo-900/40 transition rounded-lg px-2"
               style={{ animation: `fadein 0.3s ${i * 0.01}s both` }}
             >
               <div className="flex items-center gap-3">
@@ -162,14 +162,14 @@ export default function UsersList({ title, users, range }: UsersListProps) {
                     width={32}
                     height={32}
                     unoptimized
-                    className="w-8 h-8 rounded-full object-cover shadow-sm border border-indigo-200"
+                    className="w-8 h-8 rounded-full object-cover shadow-sm border border-indigo-200 dark:border-indigo-800"
                   />
                 ) : (
-                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 font-bold text-lg shadow-sm">
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-200 font-bold text-lg shadow-sm border border-indigo-200 dark:border-indigo-800">
                     {names[user]?.[0]?.toUpperCase() || user[0]}
                   </span>
                 )}
-                <span className="text-base text-gray-800 font-medium">{names[user] || user}</span>
+                <span className="text-base text-gray-800 dark:text-gray-100 font-medium">{names[user] || user}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-yellow-500 text-lg">🍺</span>

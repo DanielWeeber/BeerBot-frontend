@@ -32,8 +32,8 @@ async function proxy(
   const contentType = request.headers.get('content-type')
   if (contentType) headers.set('content-type', contentType)
 
-  // Loud log
-  console.log('proxy (app router) authSource=', authSource, 'path=', pathStr)
+  const started = Date.now()
+  console.info('[proxy] start', JSON.stringify({ method: request.method, path: pathStr, query: request.nextUrl?.searchParams?.toString() || '', authSource }))
 
   // Prepare body for non-GET/HEAD
   let body: BodyInit | undefined = undefined
@@ -53,11 +53,16 @@ async function proxy(
     const respContentType = resp.headers.get('Content-Type') || 'text/plain'
     const text = await resp.text()
 
+    const duration = Date.now() - started
+    console.info('[proxy] done', JSON.stringify({ method: request.method, path: pathStr, status: resp.status, duration_ms: duration }))
+
     return new NextResponse(text, {
       status: resp.status,
       headers: { 'Content-Type': respContentType },
     })
   } catch (err) {
+    const duration = Date.now() - started
+    console.error('[proxy] error', JSON.stringify({ method: request.method, path: pathStr, duration_ms: duration, error: (err as Error)?.message }))
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }

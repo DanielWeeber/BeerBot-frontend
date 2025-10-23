@@ -1,36 +1,21 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { ThemeProvider as NextThemesProvider, useTheme as useNextTheme } from 'next-themes'
+import type { ReactNode } from 'react'
 
-function getSystemPrefersDark(): boolean {
-  if (typeof window === 'undefined') return false
-  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-}
-
-export function ThemeProvider() {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    const stored = typeof window !== 'undefined' ? localStorage.getItem('theme') : null
-    const shouldDark = stored ? stored === 'dark' : getSystemPrefersDark()
-    const root = document.documentElement
-    root.classList.toggle('dark', shouldDark)
-    setMounted(true)
-  }, [])
-
-  // non-visual helper; ensures class applied on mount
-  return mounted ? null : null
+export function ThemeProvider({ children }: { children?: ReactNode }) {
+  return (
+    <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
+      {children}
+    </NextThemesProvider>
+  )
 }
 
 export function useTheme() {
-  function setTheme(theme: 'light' | 'dark') {
-    const root = document.documentElement
-    root.classList.toggle('dark', theme === 'dark')
-    localStorage.setItem('theme', theme)
-  }
+  const { theme, resolvedTheme, setTheme, systemTheme, themes } = useNextTheme()
   function toggleTheme() {
-    const isDark = document.documentElement.classList.contains('dark')
-    setTheme(isDark ? 'light' : 'dark')
+    const current = (resolvedTheme || theme) as 'light' | 'dark' | undefined
+    setTheme(current === 'dark' ? 'light' : 'dark')
   }
-  return { setTheme, toggleTheme }
+  return { theme, resolvedTheme, systemTheme, themes, setTheme, toggleTheme }
 }
