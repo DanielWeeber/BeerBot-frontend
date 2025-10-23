@@ -16,9 +16,9 @@ async function proxy(
 
   // Rebuild headers, propagate Authorization, or fall back to API_TOKEN
   const headers = new Headers()
-  const authHeader = request.headers.get('authorization')
+  const authHeader = request.headers.get('Authorization')
   const HARDCODED_API_TOKEN = process.env.API_TOKEN || 'my-secret-token'
-  let authSource: 'none' | 'client' | 'HARDCODED' = 'none'
+  let authSource: 'none' | 'client' | 'HARDCODED' = 'none'  
 
   if (authHeader) {
     headers.set('Authorization', authHeader)
@@ -29,11 +29,14 @@ async function proxy(
   }
 
   // Forward content-type if present
-  const contentType = request.headers.get('content-type')
-  if (contentType) headers.set('content-type', contentType)
+  const contentType = request.headers.get('Content-Type')
+  if (contentType) headers.set('Content-Type', contentType)
 
   const started = Date.now()
-  console.info('[proxy] start', JSON.stringify({ method: request.method, path: pathStr, query: request.nextUrl?.searchParams?.toString() || '', authSource }))
+  const shouldLog = pathStr === 'given' || pathStr === 'received'
+  if (shouldLog) {
+    console.info('[proxy] start', JSON.stringify({ method: request.method, path: pathStr, query: request.nextUrl?.searchParams?.toString() || '', authSource }))
+  }
 
   // Prepare body for non-GET/HEAD
   let body: BodyInit | undefined = undefined
@@ -54,7 +57,9 @@ async function proxy(
     const text = await resp.text()
 
     const duration = Date.now() - started
-    console.info('[proxy] done', JSON.stringify({ method: request.method, path: pathStr, status: resp.status, duration_ms: duration }))
+    if (shouldLog) {
+      console.info('[proxy] done', JSON.stringify({ method: request.method, path: pathStr, status: resp.status, duration_ms: duration }))
+    }
 
     return new NextResponse(text, {
       status: resp.status,
@@ -62,7 +67,9 @@ async function proxy(
     })
   } catch (err) {
     const duration = Date.now() - started
-    console.error('[proxy] error', JSON.stringify({ method: request.method, path: pathStr, duration_ms: duration, error: (err as Error)?.message }))
+    if (shouldLog) {
+      console.error('[proxy] error', JSON.stringify({ method: request.method, path: pathStr, duration_ms: duration, error: (err as Error)?.message }))
+    }
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }

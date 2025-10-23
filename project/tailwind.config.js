@@ -1,4 +1,4 @@
-export default {
+const tailwindConfig = {
   darkMode: 'class',
   content: ['./app/**/*.{js,jsx,ts,tsx}', './components/**/*.{js,jsx,ts,tsx}', './pages/**/*.{js,ts,jsx,tsx}'],
   theme: {
@@ -54,3 +54,5 @@ export default {
   },
   plugins: []
 };
+
+export default tailwindConfig;

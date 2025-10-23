@@ -83,10 +83,13 @@ export default function UsersPage(): ReactElement {
   const [recipients, setRecipients] = useState<string[]>([])
   // The proxy will inject an API token from server-side environment variables.
   useEffect(() => {
-    // Set default range based on client clock to avoid hydration mismatch
-    const now = new Date()
-    const yearStart = new Date(now.getFullYear(), 0, 1)
-    setRange({ start: yearStart.toISOString().slice(0, 10), end: now.toISOString().slice(0, 10) })
+    // Set default range using a macrotask to avoid synchronous setState inside effect
+    const id = setTimeout(() => {
+      const now = new Date()
+      const yearStart = new Date(now.getFullYear(), 0, 1)
+      setRange({ start: yearStart.toISOString().slice(0, 10), end: now.toISOString().slice(0, 10) })
+    }, 0)
+    return () => clearTimeout(id)
   }, [])
 
   useEffect(() => {
