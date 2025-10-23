@@ -33,7 +33,8 @@ async function proxy(
   if (contentType) headers.set('Content-Type', contentType)
 
   const started = Date.now()
-  const shouldLog = pathStr === 'given' || pathStr === 'received'
+  const hasUser = request.nextUrl?.searchParams?.has('user')
+  const shouldLog = (pathStr === 'given' || pathStr === 'received') && !hasUser
   if (shouldLog) {
     console.info('[proxy] start', JSON.stringify({ method: request.method, path: pathStr, query: request.nextUrl?.searchParams?.toString() || '', authSource }))
   }
