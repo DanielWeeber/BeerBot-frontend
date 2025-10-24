@@ -147,11 +147,11 @@ export default function UsersList({ title, users, range }: UsersListProps) {
       {sorted.length === 0 ? (
         <div className="text-gray-400 text-sm">No data</div>
       ) : (
-        <ul className="divide-y divide-indigo-100 dark:divide-indigo-800/50">
+        <ul className="divide-y">
           {sorted.map(({ user, count }, i) => (
             <li
               key={user}
-              className="flex items-center justify-between py-2 group hover:bg-indigo-50 dark:hover:bg-indigo-900/40 transition rounded-lg px-2"
+              className="flex items-center justify-between py-2 group hover:bg-indigo-50 transition cursor-pointer px-2"
               style={{ animation: `fadein 0.3s ${i * 0.01}s both` }}
             >
               <div className="flex items-center gap-3">
@@ -169,7 +169,7 @@ export default function UsersList({ title, users, range }: UsersListProps) {
                     {names[user]?.[0]?.toUpperCase() || user[0]}
                   </span>
                 )}
-                <span className="text-base text-gray-800 dark:text-gray-100 font-medium">{names[user] || user}</span>
+                <span className="text-base text-gray-800 font-medium">{names[user] || user}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-yellow-500 text-lg">🍺</span>

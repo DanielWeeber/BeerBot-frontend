@@ -18,7 +18,7 @@ async function proxy(
   const headers = new Headers()
   const authHeader = request.headers.get('Authorization')
   const HARDCODED_API_TOKEN = process.env.API_TOKEN || 'my-secret-token'
-  let authSource: 'none' | 'client' | 'HARDCODED' = 'none'  
+  let authSource: 'none' | 'client' | 'HARDCODED' = 'none'
 
   if (authHeader) {
     headers.set('Authorization', authHeader)
@@ -33,11 +33,9 @@ async function proxy(
   if (contentType) headers.set('Content-Type', contentType)
 
   const started = Date.now()
-  const hasUser = request.nextUrl?.searchParams?.has('user')
-  const shouldLog = (pathStr === 'given' || pathStr === 'received') && !hasUser
-  if (shouldLog) {
-    console.info('[proxy] start', JSON.stringify({ method: request.method, path: pathStr, query: request.nextUrl?.searchParams?.toString() || '', authSource }))
-  }
+  console.info('[proxy] start', JSON.stringify({ method: request.method, path: pathStr, query: request.nextUrl?.searchParams?.toString() || '', authSource }))
+
+  console.info('[proxy] url & headers', JSON.stringify({ url, headers }))
 
   // Prepare body for non-GET/HEAD
   let body: BodyInit | undefined = undefined
@@ -58,9 +56,7 @@ async function proxy(
     const text = await resp.text()
 
     const duration = Date.now() - started
-    if (shouldLog) {
-      console.info('[proxy] done', JSON.stringify({ method: request.method, path: pathStr, status: resp.status, duration_ms: duration }))
-    }
+    console.info('[proxy] done', JSON.stringify({ method: request.method, path: pathStr, status: resp.status, duration_ms: duration }))
 
     return new NextResponse(text, {
       status: resp.status,
@@ -68,9 +64,7 @@ async function proxy(
     })
   } catch (err) {
     const duration = Date.now() - started
-    if (shouldLog) {
-      console.error('[proxy] error', JSON.stringify({ method: request.method, path: pathStr, duration_ms: duration, error: (err as Error)?.message }))
-    }
+    console.error('[proxy] error', JSON.stringify({ method: request.method, path: pathStr, duration_ms: duration, error: (err as Error)?.message }))
     return NextResponse.json({ error: (err as Error).message }, { status: 500 })
   }
 }
