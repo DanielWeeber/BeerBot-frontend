@@ -1,21 +1,12 @@
 "use client"
 import React, { useEffect, useState, useRef } from 'react'
-import Image from 'next/image'
 
-type DateRange = { start?: string; end?: string }
-type UsersListProps = {
-  title: 'Givers' | 'Recipients' | string
-  users: string[]
-  range: DateRange
-}
-
-export default function UsersList({ title, users, range }: UsersListProps) {
-  const [stats, setStats] = useState<Record<string, number>>({})
-  const [names, setNames] = useState<Record<string, string>>({})
-  const [avatars, setAvatars] = useState<Record<string, string | null>>({})
-  const lastArgsRef = useRef<string | null>(null)
-  const mounted = useRef<boolean>(true)
-  const cancelledRef = useRef<boolean>(false)
+export default function UsersList({ title, users, range }) {
+  const [stats, setStats] = useState({})
+  const [names, setNames] = useState({})
+  const [avatars, setAvatars] = useState({})
+  const lastArgsRef = useRef(null)
+  const mounted = useRef(true)
 
   useEffect(() => {
     mounted.current = true
@@ -27,24 +18,15 @@ export default function UsersList({ title, users, range }: UsersListProps) {
     const usersKey = JSON.stringify(users || [])
     const rangeKey = `${range?.start ?? ''}_${range?.end ?? ''}`
     const argsKey = `${title}|${usersKey}|${rangeKey}`
-    console.log(`[UsersList:${title}] Effect triggered`, { rangeKey, argsKey, lastArgs: lastArgsRef.current })
-    
-    // Check if we should skip BEFORE modifying the ref
-    if (lastArgsRef.current === argsKey) {
-      console.log(`[UsersList:${title}] Skipping - same args`)
-      return // Return early WITHOUT cleanup - let the in-flight fetch complete
-    }
-    
-    console.log(`[UsersList:${title}] Loading stats with range:`, range)
-    
-    // Capture the args key for THIS fetch to check if it's still current when done
-    const thisArgsKey = argsKey
+    if (lastArgsRef.current === argsKey) return
     lastArgsRef.current = argsKey
-    
-    async function loadStats() {
-        const out: Record<string, number> = {}
+
+    let cancelled = false
+    const timer = setTimeout(() => {
+      async function loadStats() {
+        const out = {}
         const path = title === 'Givers' ? '/api/proxy/given' : '/api/proxy/received'
-        const params = new URLSearchParams()
+        let params = new URLSearchParams()
         if (range?.start && range?.end) {
           if (range.start === range.end) {
             params.set('day', range.start)
@@ -55,18 +37,15 @@ export default function UsersList({ title, users, range }: UsersListProps) {
         }
         const concurrency = 5
         let idx = 0
-        async function worker(): Promise<void> {
-          while (idx < users.length) {
+        async function worker() {
+          while (idx < users.length && !cancelled) {
             const i = idx++
             const u = users[i]
             const q = new URLSearchParams()
             q.set('user', u)
-            const day = params.get('day')
-            if (day) q.set('day', day)
-            const startV = params.get('start')
-            if (startV) q.set('start', startV)
-            const endV = params.get('end')
-            if (endV) q.set('end', endV)
+            if (params.has('day')) q.set('day', params.get('day'))
+            if (params.has('start')) q.set('start', params.get('start'))
+            if (params.has('end')) q.set('end', params.get('end'))
             try {
               const resp = await fetch(`${path}?${q.toString()}`)
               if (!resp.ok) {
@@ -76,26 +55,22 @@ export default function UsersList({ title, users, range }: UsersListProps) {
               const j = await resp.json()
               out[u] = title === 'Givers' ? j.given : j.received
             } catch (err) {
-              console.error(err);
               out[u] = 0
             }
           }
         }
-        const workers: Promise<void>[] = []
+        const workers = []
         for (let i = 0; i < concurrency; i++) workers.push(worker())
         await Promise.all(workers)
-        // Check if args changed while we were fetching - if so, don't update (newer fetch will handle it)
-        if (lastArgsRef.current !== thisArgsKey || !mounted.current) {
-          console.log(`[UsersList:${title}] Discarding stale stats - args changed during fetch`)
-          return
-        }
-        console.log(`[UsersList:${title}] Stats loaded:`, out)
-        setStats(out)
+        if (cancelled || !mounted.current) return
+        const prev = JSON.stringify(stats)
+        const next = JSON.stringify(out)
+        if (prev !== next && mounted.current) setStats(out)
       }
       if (users && users.length) loadStats()
       else setStats({})
-    
-    // No cleanup needed - we check thisArgsKey to detect stale fetches
+    }, 200)
+    return () => { cancelled = true; clearTimeout(timer) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [users, range.start, range.end, title])
 
@@ -122,13 +97,12 @@ export default function UsersList({ title, users, range }: UsersListProps) {
             namesOut[u] = j.real_name || u
             avatarsOut[u] = j.profile_image || null
           } catch (err) {
-            console.error(err);
             namesOut[u] = u
             avatarsOut[u] = null
           }
         }
       }
-      const workers: Promise<void>[] = []
+      const workers = []
       for (let i = 0; i < concurrency; i++) workers.push(worker())
       await Promise.all(workers)
       if (!cancelled && mounted.current) {
@@ -161,25 +135,22 @@ export default function UsersList({ title, users, range }: UsersListProps) {
       {sorted.length === 0 ? (
         <div className="text-gray-400 text-sm">No data</div>
       ) : (
-        <ul className="divide-y">
+        <ul className="divide-y divide-indigo-100">
           {sorted.map(({ user, count }, i) => (
             <li
               key={user}
-              className="flex items-center justify-between py-2 group hover:bg-indigo-50 transition cursor-pointer px-2"
+              className="flex items-center justify-between py-2 group hover:bg-indigo-50 transition rounded-lg px-2"
               style={{ animation: `fadein 0.3s ${i * 0.01}s both` }}
             >
               <div className="flex items-center gap-3">
                 {avatars[user] ? (
-                  <Image
-                    src={avatars[user] as string}
+                  <img
+                    src={avatars[user]}
                     alt={names[user] || user}
-                    width={32}
-                    height={32}
-                    unoptimized
-                    className="w-8 h-8 rounded-full object-cover shadow-sm border border-indigo-200 dark:border-indigo-800"
+                    className="w-8 h-8 rounded-full object-cover shadow-sm border border-indigo-200"
                   />
                 ) : (
-                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-200 font-bold text-lg shadow-sm border border-indigo-200 dark:border-indigo-800">
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 font-bold text-lg shadow-sm">
                     {names[user]?.[0]?.toUpperCase() || user[0]}
                   </span>
                 )}

@@ -81,8 +81,12 @@ export default function UsersPage(): ReactElement {
   const [range, setRange] = useState<DateRange>({ start: '', end: '' })
   const [givers, setGivers] = useState<string[]>([])
   const [recipients, setRecipients] = useState<string[]>([])
+  
+  console.log('[UsersPage] Component mounted/rendered')
+  
   // The proxy will inject an API token from server-side environment variables.
   useEffect(() => {
+    console.log('[UsersPage] Initial mount effect running');
     // Set default range using a macrotask to avoid synchronous setState inside effect
     const id = setTimeout(() => {
       const now = new Date()
@@ -125,6 +129,7 @@ export default function UsersPage(): ReactElement {
               key={q.label}
               className="px-3 py-1 rounded bg-indigo-100 hover:bg-indigo-300 text-indigo-900 text-sm font-medium border border-indigo-200 transition-colors duration-150 shadow-sm"
               onClick={() => {
+                console.log('[UsersPage] Button clicked:', q.label)
                 const next = q.get()
                 logger.info('range_quick', { label: q.label, start: next.start, end: next.end })
                 setRange(next)
