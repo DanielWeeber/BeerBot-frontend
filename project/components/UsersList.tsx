@@ -131,9 +131,10 @@ export default function UsersList({ title, users, range }: UsersListProps) {
     return () => { cancelled = true }
   }, [users])
 
-  // Sort users by count (desc), show only top 100
+  // Sort users by count (desc), filter out zero counts, show only top 100
   const sorted = (users ?? [])
     .map((u) => ({ user: u, count: stats[u] ?? 0 }))
+    .filter((u) => u.count > 0) // Only show users with at least 1 beer
     .sort((a, b) => (b.count ?? 0) - (a.count ?? 0))
     .slice(0, 100)
   const total = sorted.reduce((sum, u) => sum + (typeof u.count === 'number' ? u.count : 0), 0)
