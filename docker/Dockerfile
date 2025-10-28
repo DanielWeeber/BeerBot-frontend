@@ -44,9 +44,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends wget curl ca-ce
 
 # Set environment variables from build arguments
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV HOSTNAME=0.0.0.0
+ENV PORT=3000
 
 # Healthcheck and run the app
 USER bun
 EXPOSE 3000/tcp
-HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=3 CMD wget -qO- http://localhost:3000/api/health || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 ENTRYPOINT ["bun", "run", "server.js"]
